@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Token Auth with Refresh</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <div id="loginForm">
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+   <div id="profile" style="display: none;">
+    <h3>Welcome <span id="usernameDisplay"></span>!</h3>
+    <button onclick="logout()">Logout</button>
+  </div> 
+
+  <div id="validate" style="display: none;">
+    <h3>Check Access Token for <span id="usernameDisplay"></span>!</h3>
+    <button onclick="validate()">Check</button>
+  </div> 
+
+  <script>
+    const API_BASE = 'https://localhost:8443/api';
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch(`${API_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Send cookies
+        body: JSON.stringify({ username, password })
+      });
+
+      if (res.ok) {
+        const data = await res.json();        
+        localStorage.setItem('accessToken', data.token);
+        
+   //     await fetchProfile();
+
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('profile').style.display = 'block';
+        document.getElementById('usernameDisplay').innerText = username;
+
+        document.getElementById('validate').style.display = 'block';
+        document.getElementById('usernameDisplay').innerText = username;
+
+      } else {
+        alert('Login failed');
+      }
+    }
+
+    
+  /*  async function fetchProfile() {
+      const token = localStorage.getItem('accessToken');
+      let res = await fetch(`${API_BASE}/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // If token expired, try refresh
+      if (res.status === 401) {
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          logout();
+          return;
+        }
+
+        const newToken = localStorage.getItem('accessToken');
+        res = await fetch(`${API_BASE}/profile`, {
+          headers: { Authorization: `Bearer ${newToken}` }
+        });
+      }
+
+      if (res.ok) {
+        const user = await res.json();
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('profile').style.display = 'block';
+        document.getElementById('usernameDisplay').innerText = user.username;
+      } else {
+        logout();
+      }
+    }
+
+    async function refreshToken() {
+      const res = await fetch(`${API_BASE}/refresh`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('accessToken', data.token);
+        return true;
+      } else {
+        return false;
+      }
+    }
+      */
+
+    function logout() {
+      localStorage.removeItem('accessToken');
+      fetch(`${API_BASE}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      location.reload();
+    }
+
+//    window.onload = fetchProfile;
+
+  </script>
+</body>
+</html>

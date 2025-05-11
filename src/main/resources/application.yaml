@@ -1,0 +1,13 @@
+spring:
+    application:
+        name: demo
+# Enable HTTPS
+server:
+    port: 8443
+    ssl:
+        enabled: true
+        key-store: classpath:serverkey.jks
+        key-store-password: P@ssword
+        key-store-type: JKS
+        key-alias: myserver
+    
